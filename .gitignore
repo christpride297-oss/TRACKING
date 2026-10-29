@@ -6,3 +6,4 @@ shipments.db
 static/uploads/*
 !static/uploads/.gitkeep
 email_config.py
+node_modules/

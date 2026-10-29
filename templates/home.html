@@ -1,18 +1,48 @@
-﻿<!DOCTYPE html>
+﻿{% macro photo(name, alt, sizes, cls, eager=False) -%}
+<picture>
+  <source type="image/webp"
+          srcset="{{ url_for('static', filename='img/photos/' ~ name ~ '-480.webp') }} 480w, {{ url_for('static', filename='img/photos/' ~ name ~ '-900.webp') }} 900w, {{ url_for('static', filename='img/photos/' ~ name ~ '-1400.webp') }} 1400w"
+          sizes="{{ sizes }}" />
+  <img src="{{ url_for('static', filename='img/photos/' ~ name ~ '-900.jpg') }}" alt="{{ alt }}" width="900" height="563" class="{{ cls }}"
+       {% if eager %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async" />
+</picture>
+{%- endmacro %}
+{% set card_sizes = "(min-width: 1280px) 384px, (min-width: 768px) 46vw, 92vw" %}
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="NexaTrackers delivers premium global shipping, tracking, warehousing, and customs services with enterprise-grade visibility." />
-  <title>NexaTrackers | Premium Global Logistics</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@600;700;800&display=swap');
+  <meta name="description" content="Global Trackers delivers premium global shipping, tracking, warehousing, and customs services with enterprise-grade visibility." />
+  <meta name="theme-color" content="#1D4ED8" />
+  <title>Global Trackers | Premium Global Logistics</title>
 
+  <link rel="icon" href="{{ url_for('static', filename='img/logo-mark.svg') }}" type="image/svg+xml" />
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" sizes="48x48" />
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Global Trackers" />
+  <meta property="og:title" content="Global Trackers | Premium Global Logistics" />
+  <meta property="og:description" content="Air, sea, road and customs logistics with real-time shipment tracking." />
+  <meta property="og:image" content="{{ url_for('static', filename='img/og-image.jpg', _external=True) }}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@600;700;800&display=swap" />
+  <link rel="preload" as="image" type="image/webp"
+        imagesrcset="{{ url_for('static', filename='img/photos/hero-port-480.webp') }} 480w, {{ url_for('static', filename='img/photos/hero-port-900.webp') }} 900w, {{ url_for('static', filename='img/photos/hero-port-1400.webp') }} 1400w"
+        imagesizes="(min-width: 1024px) 520px, 92vw" />
+
+  <script>document.documentElement.classList.add('js');</script>
+  <style>
     :root {
-      --forest: #1B5E3F;
-      --deep: #0F3D2A;
-      --emerald: #2D8659;
+      --forest: #1D4ED8;
+      --deep: #0B2A5B;
+      --emerald: #2563EB;
       --navy: #0D3B66;
       --sky: #4A90E2;
       --light-blue: #F0F7FF;
@@ -23,23 +53,33 @@
       --charcoal: #1A202C;
     }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scroll-padding-top: 6rem; }
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       background: var(--premium-white);
       color: var(--charcoal);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     h1, h2, h3, h4, .brand-heading {
-      font-family: 'Poppins', 'Inter', sans-serif;
+      font-family: 'Poppins', 'Inter', system-ui, sans-serif;
     }
 
-    .glass {
-      background: rgba(255, 255, 255, 0.78);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(17, 24, 39, 0.06);
+    :focus-visible {
+      outline: 3px solid #60A5FA;
+      outline-offset: 2px;
+      border-radius: 0.5rem;
     }
+
+    .skip-link {
+      position: absolute;
+      left: 1rem;
+      top: -4rem;
+      z-index: 100;
+      transition: top 0.2s ease;
+    }
+    .skip-link:focus { top: 1rem; }
 
     .hero-shell {
       background: linear-gradient(135deg, var(--forest) 0%, var(--navy) 100%);
@@ -54,49 +94,72 @@
       background-size: 44px 44px;
     }
 
-    .metric-card {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-      box-shadow: 0 8px 24px rgba(13, 59, 102, 0.16);
+    .hero-title {
+      font-size: clamp(2.25rem, 1.4rem + 3.6vw, 4.25rem);
     }
 
     .service-card {
       background: linear-gradient(180deg, #fff 0%, #f8fbff 100%);
       border: 1px solid var(--light-gray);
-      transition: all 0.28s ease;
+      transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
     }
 
     .service-card:hover {
       transform: translateY(-6px);
-      border-color: rgba(45, 134, 89, 0.45);
-      box-shadow: 0 18px 32px rgba(27, 94, 63, 0.08);
+      border-color: rgba(37, 99, 235, 0.45);
+      box-shadow: 0 18px 32px rgba(29, 78, 216, 0.08);
     }
+
+    .photo-frame {
+      position: relative;
+      overflow: hidden;
+      border-radius: 1.1rem;
+      aspect-ratio: 16 / 10;
+      background: linear-gradient(135deg, #dbe7fb, #eef4ff);
+    }
+
+    .photo-frame::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 55%, rgba(11, 42, 91, 0.28));
+      pointer-events: none;
+    }
+
+    .feature-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s cubic-bezier(.2,.7,.2,1);
+    }
+
+    .service-card:hover .feature-photo { transform: scale(1.05); }
 
     .primary-btn {
       background: linear-gradient(135deg, var(--emerald) 0%, var(--sky) 100%);
-      box-shadow: 0 16px 30px rgba(45, 134, 89, 0.28);
-      transition: all 0.22s ease;
+      box-shadow: 0 16px 30px rgba(37, 99, 235, 0.28);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
     }
 
     .primary-btn:hover {
       transform: translateY(-1px) scale(1.01);
-      box-shadow: 0 18px 32px rgba(45, 134, 89, 0.32);
+      box-shadow: 0 18px 32px rgba(37, 99, 235, 0.32);
     }
 
-    .primary-btn:active {
-      transform: scale(0.98);
-    }
+    .primary-btn:active { transform: scale(0.98); }
+    .primary-btn:disabled { opacity: 0.7; cursor: progress; }
 
     .secondary-btn {
       border: 2px solid var(--forest);
       background: rgba(255,255,255,0.94);
       color: var(--forest);
-      transition: all 0.22s ease;
+      transition: background 0.22s ease, box-shadow 0.22s ease;
     }
 
     .secondary-btn:hover {
       background: var(--light-blue);
-      box-shadow: 0 12px 24px rgba(27, 94, 63, 0.08);
+      box-shadow: 0 12px 24px rgba(29, 78, 216, 0.08);
     }
 
     .section-kicker {
@@ -107,37 +170,22 @@
       font-size: 0.72rem;
     }
 
-    .faq-item {
-      border-bottom: 1px solid var(--light-gray);
-    }
+    .faq-item { border-bottom: 1px solid var(--light-gray); }
+    .faq-item:last-child { border-bottom: 0; }
 
     .faq-item.active {
       border-left: 3px solid var(--forest);
-      background: rgba(27, 94, 63, 0.02);
+      background: rgba(29, 78, 216, 0.02);
       padding-left: 1rem;
     }
 
-    .nav-shadow {
-      box-shadow: 0 10px 20px rgba(15, 61, 42, 0.08);
-    }
+    .faq-toggle .faq-icon { transition: transform 0.25s ease; }
+    .faq-item.active .faq-icon { transform: rotate(45deg); }
 
-    .mobile-menu {
-      display: none;
-    }
+    .nav-shadow { box-shadow: 0 10px 20px rgba(11, 42, 91, 0.08); }
 
-    .mobile-menu.open {
-      display: block;
-    }
-
-    .feature-photo {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 1.1rem;
-      display: block;
-      filter: saturate(0.92) contrast(1.05);
-      background: #e8eef5;
-    }
+    .mobile-menu { display: none; }
+    .mobile-menu.open { display: block; }
 
     .showcase-panel {
       background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
@@ -151,62 +199,84 @@
       backdrop-filter: blur(8px);
     }
 
+    .field {
+      width: 100%;
+      border-radius: 0.75rem;
+      border: 1px solid #e2e8f0;
+      background: #FAFBFC;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      color: #334155;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .field:focus { border-color: var(--forest); box-shadow: 0 0 0 4px #dbeafe; }
+
+    /* Scroll reveal: only hides content when JS is running, so nothing is lost without it. */
+    .js .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .js .reveal.is-visible { opacity: 1; transform: none; }
+
     @media (max-width: 767px) {
-      .nav-pill {
-        width: 100%;
-        justify-content: center;
-      }
+      .nav-pill { width: 100%; justify-content: center; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+      .js .reveal { opacity: 1; transform: none; }
     }
   </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.css') }}" />
 </head>
 <body>
+  <a href="#main" class="skip-link rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#1D4ED8] shadow-lg">Skip to content</a>
+
   <header class="sticky top-0 z-50 border-b border-[#dfeaf3] bg-white/80 backdrop-blur-md nav-shadow">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="flex h-20 items-center justify-between gap-6">
-        <a href="/" class="flex items-center gap-3" aria-label="NexaTrackers home">
-          <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1B5E3F] to-[#0D3B66] text-white shadow-lg shadow-emerald-900/20">
-            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 10l9-5 9 5-9 5-9-5zm0 0v4l9 5 9-5v-4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
+      <div class="flex h-16 items-center justify-between gap-4 sm:h-20 sm:gap-6">
+        <a href="/" class="flex shrink-0 items-center gap-3" aria-label="Global Trackers home">
+          <img src="{{ url_for('static', filename='img/logo-mark.svg') }}" alt="" width="44" height="44" class="h-10 w-10 rounded-2xl shadow-lg shadow-blue-900/20 sm:h-11 sm:w-11" />
           <div>
-            <div class="brand-heading text-xl font-extrabold tracking-tight text-[#0F3D2A]">NexaTrackers</div>
+            <div class="brand-heading text-lg font-extrabold tracking-tight text-[#0B2A5B] sm:text-xl">Global Trackers</div>
             <div class="-mt-1 text-[10px] font-semibold uppercase tracking-[0.38em] text-slate-500">LOGISTICS</div>
           </div>
         </a>
 
-        <nav class="hidden items-center gap-8 lg:flex text-sm font-medium text-slate-600">
-          <a href="#home" class="transition hover:text-[#1B5E3F]">Home</a>
-          <a href="#services" class="transition hover:text-[#1B5E3F]">Services</a>
-          <a href="#solutions" class="transition hover:text-[#1B5E3F]">Solutions</a>
-          <a href="/track" class="transition hover:text-[#1B5E3F]">Track Shipment</a>
-          <a href="#pricing" class="transition hover:text-[#1B5E3F]">Pricing</a>
-          <a href="#contact" class="transition hover:text-[#1B5E3F]">Support</a>
+        <nav class="hidden items-center gap-7 text-sm font-medium text-slate-600 lg:flex xl:gap-8" aria-label="Main">
+          <a href="#home" class="transition hover:text-[#1D4ED8]">Home</a>
+          <a href="#services" class="transition hover:text-[#1D4ED8]">Services</a>
+          <a href="#solutions" class="transition hover:text-[#1D4ED8]">Solutions</a>
+          <a href="/track" class="transition hover:text-[#1D4ED8]">Track Shipment</a>
+          <a href="#quote" class="transition hover:text-[#1D4ED8]">Get a Quote</a>
+          <a href="#contact" class="transition hover:text-[#1D4ED8]">Support</a>
         </nav>
 
         <div class="hidden items-center gap-3 md:flex">
-          <button type="button" class="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-[#1B5E3F] hover:text-[#1B5E3F]">English</button>
-          <a href="/login" class="rounded-full border border-[#1B5E3F] px-4 py-2 text-sm font-semibold text-[#1B5E3F] transition hover:bg-[#F0F7FF]">Sign in</a>
+          <a href="/login" class="rounded-full border border-[#1D4ED8] px-4 py-2 text-sm font-semibold text-[#1D4ED8] transition hover:bg-[#F0F7FF]">Sign in</a>
           <a href="#quote" class="primary-btn rounded-full px-5 py-2.5 text-sm font-semibold text-white">Request a quote</a>
         </div>
 
-        <button id="mobile-menu-button" type="button" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:border-[#1B5E3F] hover:text-[#1B5E3F] lg:hidden" aria-label="Open menu" aria-expanded="false">
-          <svg id="menu-icon" viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
+        <button id="mobile-menu-button" type="button" class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:border-[#1D4ED8] hover:text-[#1D4ED8] lg:hidden" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+          <svg id="menu-icon" viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/>
           </svg>
         </button>
       </div>
 
-      <div id="mobile-menu" class="mobile-menu mt-2 rounded-[24px] border border-[#e6edf6] bg-white p-4 shadow-[0_16px_36px_rgba(15,61,42,0.06)] lg:hidden">
-        <nav class="flex flex-col gap-2 text-sm font-medium text-slate-600">
-          <a href="#home" class="rounded-xl px-3 py-2 transition hover:bg-[#F0F7FF] hover:text-[#1B5E3F]">Home</a>
-          <a href="#services" class="rounded-xl px-3 py-2 transition hover:bg-[#F0F7FF] hover:text-[#1B5E3F]">Services</a>
-          <a href="#solutions" class="rounded-xl px-3 py-2 transition hover:bg-[#F0F7FF] hover:text-[#1B5E3F]">Solutions</a>
-          <a href="/track" class="rounded-xl px-3 py-2 transition hover:bg-[#F0F7FF] hover:text-[#1B5E3F]">Track Shipment</a>
-          <a href="#pricing" class="rounded-xl px-3 py-2 transition hover:bg-[#F0F7FF] hover:text-[#1B5E3F]">Pricing</a>
-          <a href="#contact" class="rounded-xl px-3 py-2 transition hover:bg-[#F0F7FF] hover:text-[#1B5E3F]">Support</a>
-          <div class="mt-3 flex flex-col gap-2 pt-2">
-            <a href="/login" class="nav-pill inline-flex items-center justify-center rounded-full border border-[#1B5E3F] px-4 py-2.5 font-semibold text-[#1B5E3F]">Sign in</a>
+      <div id="mobile-menu" class="mobile-menu mb-4 mt-1 rounded-[24px] border border-[#e6edf6] bg-white p-4 shadow-[0_16px_36px_rgba(11,42,91,0.06)] lg:hidden">
+        <nav class="flex flex-col gap-1 text-sm font-medium text-slate-600" aria-label="Mobile">
+          <a href="#home" class="rounded-xl px-3 py-2.5 transition hover:bg-[#F0F7FF] hover:text-[#1D4ED8]">Home</a>
+          <a href="#services" class="rounded-xl px-3 py-2.5 transition hover:bg-[#F0F7FF] hover:text-[#1D4ED8]">Services</a>
+          <a href="#solutions" class="rounded-xl px-3 py-2.5 transition hover:bg-[#F0F7FF] hover:text-[#1D4ED8]">Solutions</a>
+          <a href="/track" class="rounded-xl px-3 py-2.5 transition hover:bg-[#F0F7FF] hover:text-[#1D4ED8]">Track Shipment</a>
+          <a href="#quote" class="rounded-xl px-3 py-2.5 transition hover:bg-[#F0F7FF] hover:text-[#1D4ED8]">Get a Quote</a>
+          <a href="#contact" class="rounded-xl px-3 py-2.5 transition hover:bg-[#F0F7FF] hover:text-[#1D4ED8]">Support</a>
+          <div class="mt-3 flex flex-col gap-2 border-t border-[#eef2f7] pt-4 md:hidden">
+            <a href="/login" class="nav-pill inline-flex items-center justify-center rounded-full border border-[#1D4ED8] px-4 py-2.5 font-semibold text-[#1D4ED8]">Sign in</a>
             <a href="#quote" class="nav-pill primary-btn inline-flex items-center justify-center rounded-full px-4 py-2.5 font-semibold text-white">Request a quote</a>
           </div>
         </nav>
@@ -214,88 +284,85 @@
     </div>
   </header>
 
-  <main id="home">
-    <section class="hero-shell text-white">
-      <div class="mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6 lg:px-8 lg:pb-20 lg:pt-16">
+  <main id="main">
+    <section id="home" class="hero-shell overflow-hidden text-white">
+      <div class="mx-auto max-w-7xl px-4 pb-14 pt-10 sm:px-6 sm:pb-16 sm:pt-12 lg:px-8 lg:pb-20 lg:pt-16">
         <div class="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-          <div>
-            <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100">
-              <span class="h-2.5 w-2.5 rounded-full bg-emerald-300 animate-pulse"></span>
+          <div class="min-w-0">
+            <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-100 sm:text-xs">
+              <span class="h-2.5 w-2.5 rounded-full bg-blue-300 animate-pulse"></span>
               Trusted by modern supply chains
             </div>
 
-            <h1 class="max-w-xl text-4xl font-extrabold leading-[1.02] tracking-tight sm:text-5xl lg:text-7xl">
-              Global shipping that keeps your supply chain in motion.<br />
-              <span class="bg-gradient-to-r from-emerald-300 via-sky-200 to-white bg-clip-text text-transparent">On time, on track, on brand.</span>
+            <h1 class="hero-title max-w-2xl font-extrabold leading-[1.05] tracking-tight">
+              Global shipping that keeps your supply chain in motion.
+              <span class="mt-2 block bg-gradient-to-r from-blue-200 via-sky-200 to-white bg-clip-text text-transparent">On time, on track, on brand.</span>
             </h1>
 
             <p class="mt-6 max-w-xl text-base text-slate-200 sm:text-lg">
-              From pickup to final delivery, NexaTrackers coordinates air, sea, warehousing, and customs support with real-time visibility and a team that acts before small issues become costly delays.
+              From pickup to final delivery, Global Trackers coordinates air, sea, warehousing, and customs support with real-time visibility and a team that acts before small issues become costly delays.
             </p>
 
-            <div class="mt-8 flex flex-col gap-4 sm:flex-row">
-              <form action="/track" method="post" class="flex w-full max-w-xl gap-3 rounded-2xl border border-white/15 bg-white/5 p-2 backdrop-blur-sm sm:max-w-lg">
-                <div class="flex flex-1 items-center gap-3 rounded-xl bg-white/10 px-4">
-                  <svg viewBox="0 0 24 24" class="h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="6"/>
-                    <path d="M20 20l-4.2-4.2" stroke-linecap="round"/>
-                  </svg>
-                  <input
-                    name="tracking_number"
-                    type="text"
-                    aria-label="Tracking number"
-                    placeholder="Enter tracking number"
-                    class="w-full border-0 bg-transparent py-3 text-sm text-white placeholder:text-slate-300 focus:outline-none"
-                  />
-                </div>
-                <button type="submit" class="primary-btn rounded-xl px-5 py-3 text-sm font-semibold text-white">Track shipment</button>
-              </form>
-            </div>
+            <form action="/track" method="post" class="mt-8 flex w-full max-w-xl flex-col gap-2 rounded-2xl border border-white/15 bg-white/5 p-2 backdrop-blur-sm sm:flex-row sm:gap-3">
+              <label class="flex flex-1 items-center gap-3 rounded-xl bg-white/10 px-4">
+                <svg viewBox="0 0 24 24" class="h-5 w-5 shrink-0 text-blue-200" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="11" cy="11" r="6"/>
+                  <path d="M20 20l-4.2-4.2" stroke-linecap="round"/>
+                </svg>
+                <span class="sr-only">Tracking number</span>
+                <input
+                  name="tracking_number"
+                  type="text"
+                  required
+                  autocomplete="off"
+                  autocapitalize="characters"
+                  spellcheck="false"
+                  placeholder="Enter tracking number"
+                  class="w-full min-w-0 border-0 bg-transparent py-3.5 text-base text-white placeholder:text-slate-300 focus:outline-none sm:text-sm"
+                />
+              </label>
+              <button type="submit" class="primary-btn rounded-xl px-5 py-3.5 text-sm font-semibold text-white sm:py-3">Track shipment</button>
+            </form>
 
-            <div class="mt-8 flex flex-wrap items-center gap-4 text-sm text-slate-200">
+            <div class="mt-8 flex flex-wrap items-center gap-3 text-sm text-slate-200 sm:gap-4">
               <a href="#quote" class="secondary-btn inline-flex items-center justify-center rounded-full px-5 py-2.5 font-semibold">Book a shipment</a>
               <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-                <span class="h-2 w-2 rounded-full bg-emerald-300"></span>
+                <span class="h-2 w-2 rounded-full bg-blue-300"></span>
                 24/7 shipment monitoring
               </span>
             </div>
           </div>
 
-          <div class="relative">
-            <div class="hero-grid relative overflow-hidden rounded-[30px] border border-white/15 bg-white/5 p-4 shadow-2xl shadow-[#0F3D2A]/25">
-              <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(74,144,226,0.3),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(45,134,89,0.38),_transparent_35%)]"></div>
-              <div class="relative rounded-[26px] border border-white/10 bg-[#0b1f1a]/70 p-5">
+          <div class="relative min-w-0">
+            <div class="hero-grid relative overflow-hidden rounded-[30px] border border-white/15 bg-white/5 p-3 shadow-2xl shadow-[#0B2A5B]/25 sm:p-4">
+              <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(74,144,226,0.3),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(37,99,235,0.38),_transparent_35%)]"></div>
+              <div class="relative rounded-[26px] border border-white/10 bg-[#0a1628]/70 p-4 sm:p-5">
                 <div class="showcase-panel overflow-hidden rounded-2xl border border-white/10 shadow-lg shadow-black/20">
-                  <img
-                    src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1200&q=70&fm=jpg"
-                    alt="Shipping containers in a cargo port"
-                    class="h-64 w-full object-cover"
-                    loading="eager"
-                    decoding="async"
-                    fetchpriority="high"
-                  />
+                  {{ photo('hero-port', 'Container ship being loaded at a cargo port', '(min-width: 1024px) 520px, 92vw', 'aspect-[16/10] w-full object-cover', eager=True) }}
                 </div>
 
                 <div class="mt-5 flex items-center justify-between pb-3 text-sm text-slate-200">
                   <span class="font-medium">Shipment movement</span>
-                  <span class="rounded-full bg-emerald-500/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-200">Live</span>
+                  <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-500/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-blue-200">
+                    <span class="h-1.5 w-1.5 rounded-full bg-sky-300 animate-pulse"></span>Live
+                  </span>
                 </div>
 
-                <div class="rounded-2xl border border-white/10 bg-[#102d25] p-4 shadow-inner shadow-black/10">
-                  <div class="mb-4 flex items-center justify-between text-sm">
+                <div class="rounded-2xl border border-white/10 bg-[#0f1f3d] p-4 shadow-inner shadow-black/10">
+                  <div class="mb-4 flex flex-wrap items-center justify-between gap-2 text-sm">
                     <span class="text-slate-300">Tracking</span>
-                    <span class="font-mono text-emerald-200">IEL893136190-CARGO</span>
+                    <span class="break-all font-mono text-xs text-blue-200 sm:text-sm">IEL893136190-CARGO</span>
                   </div>
                   <div class="space-y-3">
-                    <div class="flex items-center justify-between text-sm text-slate-300">
+                    <div class="flex items-center justify-between gap-2 text-sm text-slate-300">
                       <span>Memphis, TN</span>
-                      <span>→</span>
-                      <span>New Haven, CT</span>
+                      <span aria-hidden="true">→</span>
+                      <span class="text-right">New Haven, CT</span>
                     </div>
                     <div class="h-2.5 overflow-hidden rounded-full bg-white/10">
-                      <div class="h-full w-[72%] rounded-full bg-gradient-to-r from-emerald-400 via-sky-400 to-cyan-300"></div>
+                      <div class="h-full w-[72%] rounded-full bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-300"></div>
                     </div>
-                    <div class="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-slate-400">
+                    <div class="flex items-center justify-between text-[11px] uppercase tracking-[0.18em] text-slate-400 sm:text-xs">
                       <span>Current stop</span>
                       <span>ETA 2 days</span>
                     </div>
@@ -304,11 +371,11 @@
 
                 <div class="mt-5 grid grid-cols-2 gap-3 text-sm">
                   <div class="mini-stat rounded-2xl p-4">
-                    <div class="text-2xl font-extrabold text-white">40K+</div>
+                    <div class="text-xl font-extrabold text-white sm:text-2xl">40K+</div>
                     <div class="text-slate-300">Shipments delivered</div>
                   </div>
                   <div class="mini-stat rounded-2xl p-4">
-                    <div class="text-2xl font-extrabold text-white">150+</div>
+                    <div class="text-xl font-extrabold text-white sm:text-2xl">150+</div>
                     <div class="text-slate-300">Countries served</div>
                   </div>
                 </div>
@@ -319,151 +386,103 @@
       </div>
     </section>
 
-    <section class="soft-panel border-y border-[#e6edf6]">
-      <div class="mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
-        <div class="rounded-3xl border border-[#dfeaf3] bg-white p-6 shadow-sm">
-          <div class="text-4xl font-black text-[#1B5E3F]">40K+</div>
+    <section class="soft-panel border-y border-[#e6edf6]" aria-label="Key figures">
+      <div class="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-10 sm:gap-6 sm:px-6 lg:grid-cols-4 lg:px-8">
+        <div class="reveal rounded-3xl border border-[#dfeaf3] bg-white p-5 shadow-sm sm:p-6">
+          <div class="text-3xl font-black text-[#1D4ED8] sm:text-4xl">40K+</div>
           <div class="mt-2 text-sm text-slate-600">shipments managed monthly</div>
         </div>
-        <div class="rounded-3xl border border-[#dfeaf3] bg-white p-6 shadow-sm">
-          <div class="text-4xl font-black text-[#0D3B66]">150+</div>
+        <div class="reveal rounded-3xl border border-[#dfeaf3] bg-white p-5 shadow-sm sm:p-6">
+          <div class="text-3xl font-black text-[#0D3B66] sm:text-4xl">150+</div>
           <div class="mt-2 text-sm text-slate-600">global destinations</div>
         </div>
-        <div class="rounded-3xl border border-[#dfeaf3] bg-white p-6 shadow-sm">
-          <div class="text-4xl font-black text-[#2D8659]">99.2%</div>
+        <div class="reveal rounded-3xl border border-[#dfeaf3] bg-white p-5 shadow-sm sm:p-6">
+          <div class="text-3xl font-black text-[#2563EB] sm:text-4xl">99.2%</div>
           <div class="mt-2 text-sm text-slate-600">service reliability</div>
         </div>
-        <div class="rounded-3xl border border-[#dfeaf3] bg-white p-6 shadow-sm">
-          <div class="text-4xl font-black text-[#4A90E2]">24/7</div>
+        <div class="reveal rounded-3xl border border-[#dfeaf3] bg-white p-5 shadow-sm sm:p-6">
+          <div class="text-3xl font-black text-[#4A90E2] sm:text-4xl">24/7</div>
           <div class="mt-2 text-sm text-slate-600">real-time operational support</div>
         </div>
       </div>
     </section>
 
-    <section id="services" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-3xl text-center">
+    <section id="services" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <div class="reveal mx-auto max-w-3xl text-center">
         <div class="section-kicker">What we offer</div>
         <h2 class="mt-4 text-3xl font-extrabold tracking-tight text-[#1A202C] sm:text-4xl">Comprehensive shipping solutions</h2>
-        <p class="mt-4 text-lg text-slate-600">
+        <p class="mt-4 text-base text-slate-600 sm:text-lg">
           Tailored strategies for air freight, ocean transport, warehousing, customs, and last-mile execution across every major trade route.
         </p>
       </div>
 
+      {% set services = [
+        ('air-freight', 'Cargo plane wing above the clouds', 'Air freight', 'Fast transit for urgent cargo, carefully coordinated across airline networks, customs clearance, and final-mile delivery.', 'bg-[#EAF2FF] text-[#1D4ED8]', 'M2 15l8-4 8 4-8 4-8-4zm8-4V4m8 11l2-1v-6l-2 1m-8 5v-6'),
+        ('sea-freight', 'Container ship sailing at sea', 'Sea freight', 'Cost-effective shipping for large, heavy, or consolidated loads with FCL, LCL, and port-to-door coordination.', 'bg-[#EDF2FF] text-[#0D3B66]', 'M3 14h15l2 3V18H3v-4zm2-5h11l3 3v2H5V9zm3-5h8l4 4H6V4z'),
+        ('trucking', 'Freight truck on an open highway', 'LCL & truckload', 'Flexible road freight optimization for partial and full-load transportation with scheduled last-mile precision.', 'bg-[#EEF8FF] text-[#4A90E2]', 'M3 11h18M6 7h12l2 4H4l2-4zm-2 8h18v2H4v-2z'),
+        ('warehousing', 'Warehouse aisle with stacked pallets', 'Warehousing', 'Integrated storage, inventory control, cross-docking, and dispatch planning for short or long-term supply needs.', 'bg-[#F2F7FF] text-[#0D3B66]', 'M4 20V8l8-4 8 4v12m-8-8v8m-8 0h16'),
+        ('customs', 'Logistics team working on import documents', 'Customs brokerage', 'Specialized border compliance, declarations, inspections, and fast documentation to clear goods without delays.', 'bg-[#F0F6FF] text-[#1D4ED8]', 'M7 5h10l3 4v10H4V9l3-4zm3 4h4m-4 4h4'),
+        ('import', 'Aerial view of a busy container terminal', 'Import services', 'End-to-end import support from origin pickup to destination release, documentation, and final delivery coordination.', 'bg-[#F9F2EA] text-[#B7791F]', 'M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3zm0 0v18m-8-9h16'),
+      ] %}
       <div class="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        <article class="service-card rounded-[28px] p-4">
-          <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=900&q=70&fm=jpg" alt="Cargo plane in flight" class="feature-photo mb-5" loading="lazy" decoding="async" />
-          <div class="px-4 pb-4">
-            <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#EAF6EF] text-[#1B5E3F]">
-              <svg viewBox="0 0 24 24" class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M2 15l8-4 8 4-8 4-8-4zm8-4V4m8 11l2-1v-6l-2 1m-8 5v-6" stroke-linecap="round" stroke-linejoin="round"/>
+        {% for img, alt, title, body, icon_cls, icon_path in services %}
+        <article class="reveal service-card group flex flex-col rounded-[28px] p-3 sm:p-4">
+          <div class="photo-frame mb-5">
+            {{ photo(img, alt, card_sizes, 'feature-photo') }}
+          </div>
+          <div class="flex flex-1 flex-col px-3 pb-3 sm:px-4 sm:pb-4">
+            <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl {{ icon_cls }}">
+              <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path d="{{ icon_path }}" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
-            <h3 class="text-2xl font-bold text-[#1A202C]">Air freight</h3>
-            <p class="mt-4 text-base leading-7 text-slate-600">Fast transit for urgent cargo, carefully coordinated across airline networks, customs clearance, and final-mile delivery.</p>
-            <div class="mt-6 inline-flex items-center gap-2 font-semibold text-[#1B5E3F]">Learn more <span aria-hidden="true">→</span></div>
+            <h3 class="text-xl font-bold text-[#1A202C] sm:text-2xl">{{ title }}</h3>
+            <p class="mt-3 flex-1 text-base leading-7 text-slate-600">{{ body }}</p>
+            <a href="#quote" data-freight="{{ title }}" class="quote-link mt-6 inline-flex items-center gap-2 self-start font-semibold text-[#1D4ED8]">
+              Get a quote <span aria-hidden="true" class="transition group-hover:translate-x-1">→</span>
+            </a>
           </div>
         </article>
-
-        <article class="service-card rounded-[28px] p-4">
-          <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=70&fm=jpg" alt="Container cargo ship" class="feature-photo mb-5" loading="lazy" decoding="async" />
-          <div class="px-4 pb-4">
-            <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#EDF2FF] text-[#0D3B66]">
-              <svg viewBox="0 0 24 24" class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M3 14h15l2 3V18H3v-4zm2-5h11l3 3v2H5V9zm3-5h8l4 4H6V4z" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <h3 class="text-2xl font-bold text-[#1A202C]">Sea freight</h3>
-            <p class="mt-4 text-base leading-7 text-slate-600">Cost-effective shipping for large, heavy, or consolidated loads with FCL, LCL, and port-to-door coordination.</p>
-            <div class="mt-6 inline-flex items-center gap-2 font-semibold text-[#1B5E3F]">Learn more <span aria-hidden="true">→</span></div>
-          </div>
-        </article>
-
-        <article class="service-card rounded-[28px] p-4">
-          <img src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=900&q=70&fm=jpg" alt="Trucks and freight logistics" class="feature-photo mb-5" loading="lazy" decoding="async" />
-          <div class="px-4 pb-4">
-            <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#EEF8FF] text-[#4A90E2]">
-              <svg viewBox="0 0 24 24" class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M3 11h18M6 7h12l2 4H4l2-4zm-2 8h18v2H4v-2z" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <h3 class="text-2xl font-bold text-[#1A202C]">LCL & truckload</h3>
-            <p class="mt-4 text-base leading-7 text-slate-600">Flexible road freight optimization for partial and full-load transportation with scheduled last-mile precision.</p>
-            <div class="mt-6 inline-flex items-center gap-2 font-semibold text-[#1B5E3F]">Learn more <span aria-hidden="true">→</span></div>
-          </div>
-        </article>
-
-        <article class="service-card rounded-[28px] p-4">
-          <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=900&q=70&fm=jpg" alt="Modern warehouse and cargo distribution" class="feature-photo mb-5" loading="lazy" decoding="async" />
-          <div class="px-4 pb-4">
-            <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F2F7FF] text-[#0D3B66]">
-              <svg viewBox="0 0 24 24" class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M4 20V8l8-4 8 4v12m-8-8v8m-8 0h16" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <h3 class="text-2xl font-bold text-[#1A202C]">Warehousing</h3>
-            <p class="mt-4 text-base leading-7 text-slate-600">Integrated storage, inventory control, cross-docking, and dispatch planning for short or long-term supply needs.</p>
-            <div class="mt-6 inline-flex items-center gap-2 font-semibold text-[#1B5E3F]">Learn more <span aria-hidden="true">→</span></div>
-          </div>
-        </article>
-
-        <article class="service-card rounded-[28px] p-4">
-          <img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=900&q=70&fm=jpg" alt="Customs and import paperwork" class="feature-photo mb-5" loading="lazy" decoding="async" />
-          <div class="px-4 pb-4">
-            <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F0F8F5] text-[#1B5E3F]">
-              <svg viewBox="0 0 24 24" class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M7 5h10l3 4v10H4V9l3-4zm3 4h4m-4 4h4" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <h3 class="text-2xl font-bold text-[#1A202C]">Customs brokerage</h3>
-            <p class="mt-4 text-base leading-7 text-slate-600">Specialized border compliance, declarations, inspections, and fast documentation to clear goods without delays.</p>
-            <div class="mt-6 inline-flex items-center gap-2 font-semibold text-[#1B5E3F]">Learn more <span aria-hidden="true">→</span></div>
-          </div>
-        </article>
-
-        <article class="service-card rounded-[28px] p-4">
-          <img src="https://images.unsplash.com/photo-1598257006626-48b0c252070d?auto=format&fit=crop&w=900&q=70&fm=jpg" alt="Import cargo at the port" class="feature-photo mb-5" loading="lazy" decoding="async" />
-          <div class="px-4 pb-4">
-            <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F9F2EA] text-[#B7791F]">
-              <svg viewBox="0 0 24 24" class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3zm0 0v18m-8-9h16" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <h3 class="text-2xl font-bold text-[#1A202C]">Import services</h3>
-            <p class="mt-4 text-base leading-7 text-slate-600">End-to-end import support from origin pickup to destination release, documentation, and final delivery coordination.</p>
-            <div class="mt-6 inline-flex items-center gap-2 font-semibold text-[#1B5E3F]">Learn more <span aria-hidden="true">→</span></div>
-          </div>
-        </article>
+        {% endfor %}
       </div>
     </section>
 
-    <section id="solutions" class="bg-[#0F3D2A] py-20 text-white">
+    <section id="solutions" class="bg-[#0B2A5B] py-16 text-white sm:py-20">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="grid items-center gap-10 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <div class="section-kicker text-emerald-200">Operational standards</div>
+          <div class="reveal">
+            <div class="section-kicker !text-blue-200">Operational standards</div>
             <h2 class="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">Disciplined execution with risk-aware logistics management</h2>
-            <p class="mt-5 max-w-md text-lg text-emerald-50/80">
+            <p class="mt-5 max-w-md text-base text-blue-50/80 sm:text-lg">
               We combine live visibility, documentation control, and escalation playbooks to reduce surprises and keep operations moving.
             </p>
           </div>
-          <div class="grid gap-5 md:grid-cols-2">
-            <div class="rounded-[28px] border border-white/10 bg-white/5 p-6">
-              <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-300">✓</div>
+          <div class="grid gap-4 sm:grid-cols-2 sm:gap-5">
+            <div class="reveal rounded-[28px] border border-white/10 bg-white/5 p-6">
+              <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/15 text-blue-300">
+                <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s-7-5.5-7-11a7 7 0 1114 0c0 5.5-7 11-7 11z" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.5"/></svg>
+              </div>
               <h3 class="text-xl font-bold">Real-time tracking</h3>
               <p class="mt-3 text-slate-200">Checkpoint-level visibility across origin, route, warehousing, and destination milestones.</p>
             </div>
-            <div class="rounded-[28px] border border-white/10 bg-white/5 p-6">
-              <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/15 text-sky-300">✓</div>
+            <div class="reveal rounded-[28px] border border-white/10 bg-white/5 p-6">
+              <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/15 text-sky-300">
+                <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 3h7l5 5v13H7z" stroke-linejoin="round"/><path d="M14 3v5h5M10 13h6M10 17h6" stroke-linecap="round"/></svg>
+              </div>
               <h3 class="text-xl font-bold">Structured documentation</h3>
               <p class="mt-3 text-slate-200">Validated paperwork and proactive exception handling before issues reach the customer.</p>
             </div>
-            <div class="rounded-[28px] border border-white/10 bg-white/5 p-6">
-              <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/15 text-amber-300">✓</div>
+            <div class="reveal rounded-[28px] border border-white/10 bg-white/5 p-6">
+              <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/15 text-amber-300">
+                <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
               <h3 class="text-xl font-bold">Risk mitigation</h3>
               <p class="mt-3 text-slate-200">Smart rerouting, early escalation, and contingency planning for rapidly changing conditions.</p>
             </div>
-            <div class="rounded-[28px] border border-white/10 bg-white/5 p-6">
-              <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/15 text-cyan-300">✓</div>
+            <div class="reveal rounded-[28px] border border-white/10 bg-white/5 p-6">
+              <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/15 text-cyan-300">
+                <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z" stroke-linejoin="round"/><path d="M8 10h8" stroke-linecap="round"/></svg>
+              </div>
               <h3 class="text-xl font-bold">Clear communication</h3>
               <p class="mt-3 text-slate-200">Transparent updates and responsive support to keep teams aligned from booking to delivery.</p>
             </div>
@@ -472,181 +491,156 @@
       </div>
     </section>
 
-    <section id="quote" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <section id="quote" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
       <div class="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
-        <div class="rounded-[30px] bg-[#F0F7FF] p-8">
+        <div class="reveal rounded-[30px] bg-[#F0F7FF] p-6 sm:p-8">
           <div class="section-kicker">Why choose us</div>
-          <h2 class="mt-4 text-3xl font-extrabold text-[#1A202C]">Built for confidence, speed, and control</h2>
+          <h2 class="mt-4 text-2xl font-extrabold text-[#1A202C] sm:text-3xl">Built for confidence, speed, and control</h2>
           <div class="mt-8 space-y-6">
             <div>
-              <div class="text-4xl font-black text-[#1B5E3F]">4.9/5</div>
+              <div class="text-4xl font-black text-[#1D4ED8]">4.9/5</div>
               <div class="mt-2 text-slate-600">Average customer satisfaction across premium shipping programs</div>
             </div>
             <div>
               <div class="text-4xl font-black text-[#0D3B66]">2,350+</div>
               <div class="mt-2 text-slate-600">verified customer reviews and long-term enterprise accounts</div>
             </div>
-            <div class="rounded-2xl border border-[#dfeaf3] bg-white p-5 shadow-sm">
-              <p class="text-base leading-7 text-slate-700">“NexaTrackers delivered our shipment three days early. Their communication and coordination were exceptional from booking to delivery.”</p>
-              <div class="mt-4 font-semibold text-[#1B5E3F]">— Sarah Chen, Beijing</div>
-            </div>
+            <figure class="rounded-2xl border border-[#dfeaf3] bg-white p-5 shadow-sm">
+              <blockquote class="text-base leading-7 text-slate-700">“Global Trackers delivered our shipment three days early. Their communication and coordination were exceptional from booking to delivery.”</blockquote>
+              <figcaption class="mt-4 font-semibold text-[#1D4ED8]">— Sarah Chen, Beijing</figcaption>
+            </figure>
           </div>
         </div>
 
-        <div class="rounded-[30px] border border-[#dfeaf3] bg-white p-6 shadow-[0_24px_60px_rgba(15,61,42,0.06)] sm:p-8">
+        <div class="reveal rounded-[30px] border border-[#dfeaf3] bg-white p-5 shadow-[0_24px_60px_rgba(11,42,91,0.06)] sm:p-8">
           <div class="section-kicker">Booking request</div>
-          <h3 class="mt-4 text-3xl font-extrabold text-[#1A202C]">Plan your next shipment</h3>
+          <h3 class="mt-4 text-2xl font-extrabold text-[#1A202C] sm:text-3xl">Plan your next shipment</h3>
+          <p class="mt-2 text-sm text-slate-500">Tell us about your cargo and a logistics specialist will reply with a quote.</p>
 
-          <div class="mt-8">
-            <div class="mb-8 flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2 text-sm font-semibold text-[#1B5E3F]">
-                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-[#1B5E3F] text-white">1</span>
-                Sender
+          <form id="quote-form" action="/contact" method="post" class="mt-8 space-y-5">
+            <input type="hidden" name="subject" value="Shipment quote request" />
+
+            <div class="grid gap-5 md:grid-cols-2">
+              <div>
+                <label for="q-name" class="mb-2 block text-sm font-semibold text-[#2C3E50]">Your name</label>
+                <input id="q-name" name="name" type="text" required autocomplete="name" placeholder="John Doe" class="field" />
               </div>
-              <div class="h-px flex-1 bg-[#dfeaf3]"></div>
-              <div class="flex items-center gap-2 text-sm font-semibold text-slate-400">
-                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-slate-300 text-slate-400">2</span>
-                Receiver
-              </div>
-              <div class="h-px flex-1 bg-[#dfeaf3]"></div>
-              <div class="flex items-center gap-2 text-sm font-semibold text-slate-400">
-                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-slate-300 text-slate-400">3</span>
-                Details
+              <div>
+                <label for="q-email" class="mb-2 block text-sm font-semibold text-[#2C3E50]">Email</label>
+                <input id="q-email" name="email" type="email" required autocomplete="email" placeholder="john@company.com" class="field" />
               </div>
             </div>
 
-            <form class="space-y-5">
-              <div class="grid gap-5 md:grid-cols-2">
-                <div>
-                  <label class="mb-2 block text-sm font-semibold text-[#2C3E50]">Sender name</label>
-                  <input type="text" placeholder="John Doe" class="w-full rounded-xl border border-[#e2e8f0] bg-[#FAFBFC] px-4 py-3 text-base text-slate-700 outline-none transition focus:border-[#1B5E3F] focus:ring-4 focus:ring-emerald-100" />
-                </div>
-                <div>
-                  <label class="mb-2 block text-sm font-semibold text-[#2C3E50]">Email</label>
-                  <input type="email" placeholder="john@company.com" class="w-full rounded-xl border border-[#e2e8f0] bg-[#FAFBFC] px-4 py-3 text-base text-slate-700 outline-none transition focus:border-[#1B5E3F] focus:ring-4 focus:ring-emerald-100" />
-                </div>
+            <div class="grid gap-5 md:grid-cols-2">
+              <div>
+                <label for="q-origin" class="mb-2 block text-sm font-semibold text-[#2C3E50]">Origin country</label>
+                <select id="q-origin" data-label="Origin" class="field">
+                  <option>United States</option>
+                  <option>United Kingdom</option>
+                  <option>Germany</option>
+                  <option>United Arab Emirates</option>
+                  <option>China</option>
+                  <option>Other</option>
+                </select>
               </div>
+              <div>
+                <label for="q-destination" class="mb-2 block text-sm font-semibold text-[#2C3E50]">Destination country</label>
+                <select id="q-destination" data-label="Destination" class="field">
+                  <option>United Kingdom</option>
+                  <option>Canada</option>
+                  <option>Australia</option>
+                  <option>Saudi Arabia</option>
+                  <option>United States</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
 
-              <div class="grid gap-5 md:grid-cols-2">
-                <div>
-                  <label class="mb-2 block text-sm font-semibold text-[#2C3E50]">Origin country</label>
-                  <select class="w-full rounded-xl border border-[#e2e8f0] bg-[#FAFBFC] px-4 py-3 text-base text-slate-700 outline-none transition focus:border-[#1B5E3F] focus:ring-4 focus:ring-emerald-100">
-                    <option>United States</option>
-                    <option>United Kingdom</option>
-                    <option>Germany</option>
-                    <option>United Arab Emirates</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="mb-2 block text-sm font-semibold text-[#2C3E50]">Destination country</label>
-                  <select class="w-full rounded-xl border border-[#e2e8f0] bg-[#FAFBFC] px-4 py-3 text-base text-slate-700 outline-none transition focus:border-[#1B5E3F] focus:ring-4 focus:ring-emerald-100">
-                    <option>United Kingdom</option>
-                    <option>Canada</option>
-                    <option>Australia</option>
-                    <option>Saudi Arabia</option>
-                  </select>
-                </div>
+            <div class="grid gap-5 md:grid-cols-2">
+              <div>
+                <label for="q-freight" class="mb-2 block text-sm font-semibold text-[#2C3E50]">Freight type</label>
+                <select id="q-freight" data-label="Freight type" class="field">
+                  {% for _, _, title, _, _, _ in services %}<option>{{ title }}</option>{% endfor %}
+                </select>
               </div>
+              <div>
+                <label for="q-date" class="mb-2 block text-sm font-semibold text-[#2C3E50]">Pickup date</label>
+                <input id="q-date" type="date" data-label="Pickup date" class="field" />
+              </div>
+            </div>
 
-              <div class="grid gap-5 md:grid-cols-2">
-                <div>
-                  <label class="mb-2 block text-sm font-semibold text-[#2C3E50]">Freight type</label>
-                  <select class="w-full rounded-xl border border-[#e2e8f0] bg-[#FAFBFC] px-4 py-3 text-base text-slate-700 outline-none transition focus:border-[#1B5E3F] focus:ring-4 focus:ring-emerald-100">
-                    <option>Air freight</option>
-                    <option>Sea freight</option>
-                    <option>LCL & truckload</option>
-                    <option>Warehousing</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="mb-2 block text-sm font-semibold text-[#2C3E50]">Pickup date</label>
-                  <input type="date" class="w-full rounded-xl border border-[#e2e8f0] bg-[#FAFBFC] px-4 py-3 text-base text-slate-700 outline-none transition focus:border-[#1B5E3F] focus:ring-4 focus:ring-emerald-100" />
-                </div>
-              </div>
+            <div>
+              <label for="q-details" class="mb-2 block text-sm font-semibold text-[#2C3E50]">Cargo details</label>
+              <textarea id="q-details" name="message" rows="3" required placeholder="What are you shipping? Approximate weight, dimensions, number of items…" class="field resize-y"></textarea>
+            </div>
 
-              <div class="flex flex-col gap-4 pt-3 sm:flex-row sm:justify-end">
-                <button type="button" class="secondary-btn rounded-full px-6 py-3 text-sm font-semibold">Save draft</button>
-                <button type="submit" class="primary-btn rounded-full px-6 py-3 text-sm font-semibold text-white">Continue booking</button>
-              </div>
-            </form>
-          </div>
+            <div class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
+              <p class="text-xs text-slate-500">We reply within one business day. See our <a href="/privacy" class="underline hover:text-[#1D4ED8]">privacy policy</a>.</p>
+              <button type="submit" class="primary-btn rounded-full px-6 py-3 text-sm font-semibold text-white">Request my quote</button>
+            </div>
+          </form>
         </div>
       </div>
     </section>
 
-    <section class="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-3xl text-center">
+    <section class="mx-auto max-w-7xl px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8" aria-labelledby="faq-title">
+      <div class="reveal mx-auto max-w-3xl text-center">
         <div class="section-kicker">FAQ</div>
-        <h2 class="mt-4 text-3xl font-extrabold tracking-tight text-[#1A202C] sm:text-4xl">Questions from modern shippers</h2>
+        <h2 id="faq-title" class="mt-4 text-3xl font-extrabold tracking-tight text-[#1A202C] sm:text-4xl">Questions from modern shippers</h2>
       </div>
 
-      <div class="mt-10 rounded-[30px] border border-[#e6edf6] bg-white p-3 shadow-[0_18px_40px_rgba(15,61,42,0.04)] sm:p-6">
-        <div class="faq-item active p-5">
-          <button class="faq-toggle flex w-full items-center justify-between gap-4 text-left text-lg font-semibold text-[#1A202C]" type="button">
-            <span>How long does international shipping take?</span>
-            <span class="text-2xl text-[#1B5E3F]">+</span>
+      {% set faqs = [
+        ('How long does international shipping take?', 'Delivery windows vary by route and service level, but our air freight programs typically range from 3 to 10 business days, while ocean freight averages 2 to 6 weeks depending on the lane and customs process.'),
+        ('Can I change my shipment details after booking?', 'Yes. We can usually adjust pickup schedules, destination notes, or handling instructions before the shipment leaves the origin point. Changes are subject to carrier acceptance and service availability.'),
+        ('Do you offer insurance?', 'Absolutely. We offer coverage options for standard, premium, and high-value freight, with transparent pricing and clear terms for protected shipments.'),
+        ('Can I track my shipment in real time?', 'Yes. Every booking includes a live tracking number and timeline updates, so you can monitor progress from pickup to final delivery without needing to contact support.'),
+      ] %}
+      <div class="mt-10 rounded-[30px] border border-[#e6edf6] bg-white p-2 shadow-[0_18px_40px_rgba(11,42,91,0.04)] sm:p-6">
+        {% for q, a in faqs %}
+        <div class="faq-item p-4 sm:p-5 {% if loop.first %}active{% endif %}">
+          <button class="faq-toggle flex w-full items-center justify-between gap-4 text-left text-base font-semibold text-[#1A202C] sm:text-lg" type="button"
+                  aria-expanded="{{ 'true' if loop.first else 'false' }}" aria-controls="faq-{{ loop.index }}">
+            <span>{{ q }}</span>
+            <span class="faq-icon text-2xl leading-none text-[#1D4ED8]" aria-hidden="true">+</span>
           </button>
-          <div class="faq-content mt-4 max-w-2xl text-slate-600">
-            Delivery windows vary by route and service level, but our air freight programs typically range from 3 to 10 business days, while ocean freight averages 2 to 6 weeks depending on the lane and customs process.
-          </div>
+          <div id="faq-{{ loop.index }}" class="faq-content mt-4 max-w-2xl text-slate-600 {% if not loop.first %}hidden{% endif %}">{{ a }}</div>
         </div>
-
-        <div class="faq-item p-5">
-          <button class="faq-toggle flex w-full items-center justify-between gap-4 text-left text-lg font-semibold text-[#1A202C]" type="button">
-            <span>Can I change my shipment details after booking?</span>
-            <span class="text-2xl text-[#1B5E3F]">+</span>
-          </button>
-          <div class="faq-content hidden mt-4 max-w-2xl text-slate-600">
-            Yes. We can usually adjust pickup schedules, destination notes, or handling instructions before the shipment leaves the origin point. Changes are subject to carrier acceptance and service availability.
-          </div>
-        </div>
-
-        <div class="faq-item p-5">
-          <button class="faq-toggle flex w-full items-center justify-between gap-4 text-left text-lg font-semibold text-[#1A202C]" type="button">
-            <span>Do you offer insurance?</span>
-            <span class="text-2xl text-[#1B5E3F]">+</span>
-          </button>
-          <div class="faq-content hidden mt-4 max-w-2xl text-slate-600">
-            Absolutely. We offer coverage options for standard, premium, and high-value freight, with transparent pricing and clear terms for protected shipments.
-          </div>
-        </div>
-
-        <div class="faq-item p-5">
-          <button class="faq-toggle flex w-full items-center justify-between gap-4 text-left text-lg font-semibold text-[#1A202C]" type="button">
-            <span>Can I track my shipment in real time?</span>
-            <span class="text-2xl text-[#1B5E3F]">+</span>
-          </button>
-          <div class="faq-content hidden mt-4 max-w-2xl text-slate-600">
-            Yes. Every booking includes a live tracking number and timeline updates, so you can monitor progress from pickup to final delivery without needing to contact support.
-          </div>
-        </div>
+        {% endfor %}
       </div>
     </section>
 
-    <section id="contact" class="bg-[#FAFBFC] py-20">
+    <section id="contact" class="bg-[#FAFBFC] py-16 sm:py-20">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="mx-auto max-w-3xl text-center">
+        <div class="reveal mx-auto max-w-3xl text-center">
           <div class="section-kicker">Talk to an expert</div>
           <h2 class="mt-4 text-3xl font-extrabold tracking-tight text-[#1A202C] sm:text-4xl">Need a reliable shipping partner?</h2>
         </div>
-        <div class="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          <div class="rounded-[28px] border border-[#e6edf6] bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-            <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#EAF6EF] text-2xl text-[#1B5E3F]">📞</div>
+        <div class="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4">
+          <a href="tel:+17189138624" class="reveal block rounded-[28px] border border-[#e6edf6] bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+            <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#EAF2FF] text-[#1D4ED8]">
+              <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z" stroke-linejoin="round"/></svg>
+            </div>
             <div class="text-lg font-semibold text-[#1A202C]">Call us anytime</div>
             <div class="mt-2 text-slate-600">+1 (718) 913-8624</div>
-          </div>
-          <div class="rounded-[28px] border border-[#e6edf6] bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-            <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#EAF6EF] text-2xl text-[#1B5E3F]">✉️</div>
+          </a>
+          <a href="mailto:info@nexatrackers.com" class="reveal block rounded-[28px] border border-[#e6edf6] bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+            <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#EAF2FF] text-[#1D4ED8]">
+              <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6" stroke-linejoin="round"/></svg>
+            </div>
             <div class="text-lg font-semibold text-[#1A202C]">Email support</div>
-            <div class="mt-2 text-slate-600">info@nexatrackers.com</div>
-          </div>
-          <div class="rounded-[28px] border border-[#e6edf6] bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-            <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#EAF6EF] text-2xl text-[#1B5E3F]">💬</div>
-            <div class="text-lg font-semibold text-[#1A202C]">Live chat</div>
-            <div class="mt-2 text-slate-600">Start a conversation</div>
-          </div>
-          <div class="rounded-[28px] border border-[#e6edf6] bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-            <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#EAF6EF] text-2xl text-[#1B5E3F]">🕐</div>
+            <div class="mt-2 break-all text-slate-600">info@nexatrackers.com</div>
+          </a>
+          <a href="/contact" class="reveal block rounded-[28px] border border-[#e6edf6] bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+            <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#EAF2FF] text-[#1D4ED8]">
+              <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z" stroke-linejoin="round"/><path d="M8 9h8M8 12h5" stroke-linecap="round"/></svg>
+            </div>
+            <div class="text-lg font-semibold text-[#1A202C]">Send a message</div>
+            <div class="mt-2 text-slate-600">Use our contact form</div>
+          </a>
+          <div class="reveal rounded-[28px] border border-[#e6edf6] bg-white p-6 text-center shadow-sm">
+            <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#EAF2FF] text-[#1D4ED8]">
+              <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
             <div class="text-lg font-semibold text-[#1A202C]">Hours</div>
             <div class="mt-2 text-slate-600">24/7/365</div>
           </div>
@@ -658,63 +652,103 @@
   <footer class="border-t border-[#e6edf6] bg-white">
     <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 text-sm text-slate-600 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
       <div class="flex items-center gap-3">
-        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#1B5E3F] to-[#0D3B66] text-white">
-          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 10l9-5 9 5-9 5-9-5zm0 0v4l9 5 9-5v-4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
+        <img src="{{ url_for('static', filename='img/logo-mark.svg') }}" alt="" width="40" height="40" class="h-10 w-10 rounded-xl" loading="lazy" />
         <div>
-          <div class="brand-heading text-lg font-extrabold text-[#0F3D2A]">NexaTrackers</div>
+          <div class="brand-heading text-lg font-extrabold text-[#0B2A5B]">Global Trackers</div>
           <div class="-mt-1 text-[9px] font-semibold uppercase tracking-[0.28em] text-slate-500">LOGISTICS</div>
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center gap-6">
-        <a href="#services" class="transition hover:text-[#1B5E3F]">Services</a>
-        <a href="/track" class="transition hover:text-[#1B5E3F]">Track</a>
-        <a href="#quote" class="transition hover:text-[#1B5E3F]">Booking</a>
-        <a href="/contact" class="transition hover:text-[#1B5E3F]">Contact</a>
-      </div>
+      <nav class="flex flex-wrap items-center gap-x-6 gap-y-3" aria-label="Footer">
+        <a href="#services" class="transition hover:text-[#1D4ED8]">Services</a>
+        <a href="/track" class="transition hover:text-[#1D4ED8]">Track</a>
+        <a href="#quote" class="transition hover:text-[#1D4ED8]">Booking</a>
+        <a href="/about" class="transition hover:text-[#1D4ED8]">About</a>
+        <a href="/contact" class="transition hover:text-[#1D4ED8]">Contact</a>
+        <a href="/privacy" class="transition hover:text-[#1D4ED8]">Privacy</a>
+      </nav>
 
-      <div class="text-slate-500">© 2026 NexaTrackers</div>
+      <div class="text-slate-500">© <span id="year">2026</span> Global Trackers</div>
     </div>
   </footer>
 
   <script>
-    const faqToggles = document.querySelectorAll('.faq-toggle');
-    faqToggles.forEach((toggle) => {
+    // FAQ accordion
+    document.querySelectorAll('.faq-toggle').forEach((toggle) => {
       toggle.addEventListener('click', () => {
         const item = toggle.closest('.faq-item');
-        const content = item.querySelector('.faq-content');
-        const isOpen = item.classList.contains('active');
+        const wasOpen = item.classList.contains('active');
 
         document.querySelectorAll('.faq-item').forEach((faq) => {
           faq.classList.remove('active');
           faq.querySelector('.faq-content').classList.add('hidden');
-          faq.querySelector('.faq-toggle span:last-child').textContent = '+';
+          faq.querySelector('.faq-toggle').setAttribute('aria-expanded', 'false');
         });
 
-        if (!isOpen) {
+        if (!wasOpen) {
           item.classList.add('active');
-          content.classList.remove('hidden');
-          toggle.querySelector('span:last-child').textContent = '−';
+          item.querySelector('.faq-content').classList.remove('hidden');
+          toggle.setAttribute('aria-expanded', 'true');
         }
       });
     });
 
+    // Mobile menu
     const menuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
     const menuIcon = document.getElementById('menu-icon');
 
-    if (menuButton && mobileMenu) {
-      menuButton.addEventListener('click', () => {
-        const isOpen = mobileMenu.classList.toggle('open');
-        menuButton.setAttribute('aria-expanded', String(isOpen));
-        menuIcon.innerHTML = isOpen
-          ? '<path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/>'
-          : '<path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/>';
-      });
+    function setMenu(open) {
+      mobileMenu.classList.toggle('open', open);
+      menuButton.setAttribute('aria-expanded', String(open));
+      menuButton.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      menuIcon.innerHTML = open
+        ? '<path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/>'
+        : '<path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/>';
     }
+
+    if (menuButton && mobileMenu) {
+      menuButton.addEventListener('click', () => setMenu(!mobileMenu.classList.contains('open')));
+      mobileMenu.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setMenu(false)));
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+      window.matchMedia('(min-width: 1024px)').addEventListener('change', (e) => { if (e.matches) setMenu(false); });
+    }
+
+    // "Get a quote" on a service card preselects that freight type
+    const freightSelect = document.getElementById('q-freight');
+    document.querySelectorAll('.quote-link').forEach((link) => {
+      link.addEventListener('click', () => { freightSelect.value = link.dataset.freight; });
+    });
+
+    // Quote form: fold the route details into the message the contact endpoint emails
+    const quoteForm = document.getElementById('quote-form');
+    quoteForm.addEventListener('submit', () => {
+      const details = quoteForm.querySelector('[name="message"]');
+      const summary = [...quoteForm.querySelectorAll('[data-label]')]
+        .filter((el) => el.value)
+        .map((el) => `${el.dataset.label}: ${el.value}`)
+        .join('\n');
+      details.value = `${summary}\n\n${details.value}`;
+      quoteForm.querySelector('button[type="submit"]').disabled = true;
+    });
+
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -8% 0px' });
+      revealEls.forEach((el) => io.observe(el));
+    } else {
+      revealEls.forEach((el) => el.classList.add('is-visible'));
+    }
+
+    document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
