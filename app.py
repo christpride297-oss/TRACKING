@@ -730,6 +730,32 @@ def edit_shipment(shipment_id):
             flash("Weight and dimensions must be valid numbers.")
             return redirect(url_for("edit_shipment", shipment_id=shipment_id))
 
+        image_message = ""
+        if "image_filename" in available_columns:
+            file = request.files.get("package_image")
+            if file and file.filename:
+                if not allowed_file(file.filename):
+                    flash("Image must be a PNG, JPG, JPEG, WEBP or GIF file.")
+                    return redirect(url_for("edit_shipment", shipment_id=shipment_id))
+                try:
+                    result = cloudinary.uploader.upload(
+                        file, folder="nexatrack", public_id=shipment["tracking_number"],
+                        overwrite=True, invalidate=True,
+                    )
+                    updates["image_filename"] = result.get("secure_url", "")
+                    image_message = " Image replaced."
+                except Exception as e:
+                    print(f"[CLOUDINARY ERROR] {e}")
+                    image_message = " The new image could not be uploaded, so the old image was kept."
+            elif request.form.get("remove_image") and shipment.get("image_filename"):
+                if "res.cloudinary.com" in shipment["image_filename"]:
+                    try:
+                        cloudinary.uploader.destroy(f"nexatrack/{shipment['tracking_number']}", invalidate=True)
+                    except Exception as e:
+                        print(f"[CLOUDINARY ERROR] {e}")
+                updates["image_filename"] = ""
+                image_message = " Image removed."
+
         if not updates:
             flash("No editable shipment fields are available in the database.")
             return redirect(url_for("edit_shipment", shipment_id=shipment_id))
@@ -762,7 +788,7 @@ def edit_shipment(shipment_id):
                     current_location, current_status
                 )
 
-        flash(f"Shipment {shipment['tracking_number']} updated successfully.")
+        flash(f"Shipment {shipment['tracking_number']} updated successfully.{image_message}")
         return redirect(url_for("edit_shipment", shipment_id=shipment_id))
 
     return render_template("shipment_edit.html", shipment=shipment)

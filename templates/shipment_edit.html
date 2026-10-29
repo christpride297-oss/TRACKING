@@ -32,7 +32,7 @@
       {% endif %}
     {% endwith %}
 
-    <form method="POST" class="space-y-6">
+    <form method="POST" enctype="multipart/form-data" class="space-y-6">
       <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 class="mb-4 text-base font-bold text-slate-900">Status and route</h2>
         <div class="grid gap-4 md:grid-cols-2">
@@ -150,6 +150,30 @@
         </div>
       </section>
 
+      <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 class="mb-4 text-base font-bold text-slate-900">Package image</h2>
+        <div class="grid gap-5 md:grid-cols-[220px_1fr] md:items-start">
+          <div class="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+            <img id="image-preview" src="{{ shipment['image_filename'] or '' }}" alt="Package image"
+                 class="h-full w-full object-cover {% if not shipment['image_filename'] %}hidden{% endif %}"/>
+            <span id="image-empty" class="px-4 text-center text-sm text-slate-400 {% if shipment['image_filename'] %}hidden{% endif %}">No image</span>
+          </div>
+          <div class="space-y-4">
+            <label class="block text-sm font-medium">{% if shipment['image_filename'] %}Replace image{% else %}Upload image{% endif %}
+              <input id="package-image" name="package_image" type="file" accept="image/png,image/jpeg,image/webp,image/gif"
+                     class="mt-1 block w-full text-sm font-normal text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"/>
+            </label>
+            <p class="text-xs text-slate-500">PNG, JPG, WEBP or GIF. The new image replaces the current one when you save.</p>
+            {% if shipment['image_filename'] %}
+            <label id="remove-image-row" class="flex items-center gap-2 text-sm font-medium text-red-700">
+              <input id="remove-image" name="remove_image" type="checkbox" value="1" class="h-4 w-4 rounded border-slate-300"/>
+              Remove current image
+            </label>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
       <div class="flex flex-wrap justify-end gap-3">
         <a href="{{ url_for('admin_dashboard') }}" class="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700">Cancel</a>
         <button type="submit" class="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">Save shipment changes</button>
@@ -157,5 +181,41 @@
     </form>
   </main>
   <script src="{{ url_for('static', filename='js/location-autocomplete.js') }}"></script>
+  <script>
+    (function () {
+      const input = document.getElementById('package-image');
+      const preview = document.getElementById('image-preview');
+      const empty = document.getElementById('image-empty');
+      const remove = document.getElementById('remove-image');
+      const originalSrc = preview.getAttribute('src');
+
+      function show(src) {
+        preview.src = src || '';
+        preview.classList.toggle('hidden', !src);
+        empty.classList.toggle('hidden', !!src);
+      }
+
+      input.addEventListener('change', () => {
+        const file = input.files[0];
+        if (file) {
+          if (remove) remove.checked = false;
+          show(URL.createObjectURL(file));
+        } else {
+          show(originalSrc);
+        }
+      });
+
+      if (remove) {
+        remove.addEventListener('change', () => {
+          if (remove.checked) {
+            input.value = '';
+            show('');
+          } else {
+            show(originalSrc);
+          }
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
