@@ -1,0 +1,22 @@
+{% if tawk_property_id %}
+<script>
+  var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+  (function () {
+    var s1 = document.createElement('script'), s0 = document.getElementsByTagName('script')[0];
+    s1.async = true;
+    s1.src = 'https://embed.tawk.to/' + {{ tawk_property_id|tojson }} + '/' + {{ tawk_widget_id|tojson }};
+    s1.charset = 'UTF-8';
+    s1.setAttribute('crossorigin', '*');
+    s0.parentNode.insertBefore(s1, s0);
+  })();
+
+  // Any element with data-open-chat opens the chat window instead of following its link.
+  document.addEventListener('click', function (e) {
+    var trigger = e.target.closest('[data-open-chat]');
+    if (trigger && window.Tawk_API && typeof Tawk_API.maximize === 'function') {
+      e.preventDefault();
+      Tawk_API.maximize();
+    }
+  });
+</script>
+{% endif %}

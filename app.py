@@ -386,6 +386,14 @@ def login_required(role=None):
     return decorator
 
 
+@app.context_processor
+def inject_live_chat():
+    # Tawk.to live chat widget; set TAWK_PROPERTY_ID to an empty value to turn it off.
+    return {
+        "tawk_property_id": os.environ.get("TAWK_PROPERTY_ID", "6ae43d4e592a7c3475608dc6").strip(),
+        "tawk_widget_id": os.environ.get("TAWK_WIDGET_ID", "1k65ouvmh").strip() or "default",
+    }
+
 
 @app.route("/")
 def home():

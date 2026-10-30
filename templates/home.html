@@ -630,12 +630,17 @@
             <div class="text-lg font-semibold text-[#1A202C]">Email support</div>
             <div class="mt-2 break-all text-slate-600">info@nexatrackers.com</div>
           </a>
-          <a href="/contact" class="reveal block rounded-[28px] border border-[#e6edf6] bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+          <a href="/contact" {% if tawk_property_id %}data-open-chat{% endif %} class="reveal block rounded-[28px] border border-[#e6edf6] bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
             <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#EAF2FF] text-[#1D4ED8]">
               <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z" stroke-linejoin="round"/><path d="M8 9h8M8 12h5" stroke-linecap="round"/></svg>
             </div>
+            {% if tawk_property_id %}
+            <div class="text-lg font-semibold text-[#1A202C]">Live chat</div>
+            <div class="mt-2 text-slate-600">Chat with our team now</div>
+            {% else %}
             <div class="text-lg font-semibold text-[#1A202C]">Send a message</div>
             <div class="mt-2 text-slate-600">Use our contact form</div>
+            {% endif %}
           </a>
           <div class="reveal rounded-[28px] border border-[#e6edf6] bg-white p-6 text-center shadow-sm">
             <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#EAF2FF] text-[#1D4ED8]">
@@ -750,5 +755,6 @@
 
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
+  {% include "_live_chat.html" %}
 </body>
 </html>
