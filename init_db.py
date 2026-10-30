@@ -66,7 +66,7 @@ def init():
     try:
         conn.execute(
             "INSERT INTO users (username, password_hash, email, role) VALUES (?, ?, ?, 'admin')",
-            ("admin", generate_password_hash("admin123"), "admin@shiptrack.com")
+            ("admin", generate_password_hash("admin123"), "info@globaltrackerexpress.com")
         )
         conn.commit()
         print("✓ Database initialized. Admin → username: admin / password: admin123")

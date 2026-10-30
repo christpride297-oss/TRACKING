@@ -45,9 +45,9 @@ try:
 except ImportError:
     class email_config:
         MAIL_ENABLED  = os.environ.get("MAIL_ENABLED", "false").lower() == "true"
-        MAIL_SENDER   = os.environ.get("MAIL_SENDER", "")
+        MAIL_SENDER   = os.environ.get("MAIL_SENDER", "info@globaltrackerexpress.com")
         MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "")
-        MAIL_SMTP     = os.environ.get("MAIL_SMTP", "smtp.hostinger.com")
+        MAIL_SMTP     = os.environ.get("MAIL_SMTP", "mail.spacemail.com")
         MAIL_PORT     = int(os.environ.get("MAIL_PORT", "465"))
 
 
@@ -290,7 +290,7 @@ def init_db():
             admin_pass = os.environ.get("ADMIN_PASSWORD", "admin123")
             cur.execute(
                 "INSERT INTO users (username, password_hash, email, role) VALUES (%s, %s, %s, 'admin')",
-                ("admin", generate_password_hash(admin_pass), "admin@logisticsroyal.com")
+                ("admin", generate_password_hash(admin_pass), "info@globaltrackerexpress.com")
             )
     else:
         # SQLite
@@ -359,7 +359,7 @@ def init_db():
             admin_pass = os.environ.get("ADMIN_PASSWORD", "admin123")
             cur.execute(
                 "INSERT INTO users (username, password_hash, email, role) VALUES (?, ?, ?, 'admin')",
-                ("admin", generate_password_hash(admin_pass), "admin@logisticsroyal.com")
+                ("admin", generate_password_hash(admin_pass), "info@globaltrackerexpress.com")
             )
 
     conn.commit()
@@ -421,7 +421,8 @@ def contact():
                     msg = MIMEMultipart("alternative")
                     msg["Subject"] = f"[Global Trackers Contact] {subject or 'New Enquiry'}"
                     msg["From"]    = email_config.MAIL_SENDER
-                    msg["To"]      = "info@nexatrackers.com"
+                    msg["To"]      = email_config.MAIL_SENDER
+                    msg["Reply-To"] = email
                     html = f"""
                     <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto">
                       <div style="background:#1e3a5f;padding:24px 32px">

@@ -66,7 +66,7 @@ cur.execute("SELECT id FROM users WHERE username = 'admin'")
 if not cur.fetchone():
     cur.execute(
         "INSERT INTO users (username, password_hash, email, role) VALUES (%s, %s, %s, 'admin')",
-        ("admin", generate_password_hash("admin123"), "admin@logisticsroyal.com")
+        ("admin", generate_password_hash("admin123"), "info@globaltrackerexpress.com")
     )
     print("Admin user created.")
 else:
