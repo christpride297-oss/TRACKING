@@ -1,5 +1,5 @@
 """
-Global Trackers - Shipment Tracking Application
+freightshippinglogistics - Shipment Tracking Application
 PostgreSQL version for Vercel deployment
 """
 import os
@@ -45,7 +45,7 @@ try:
 except ImportError:
     class email_config:
         MAIL_ENABLED  = os.environ.get("MAIL_ENABLED", "false").lower() == "true"
-        MAIL_SENDER   = os.environ.get("MAIL_SENDER", "info@globaltrackerexpress.com")
+        MAIL_SENDER   = os.environ.get("MAIL_SENDER", "info@freightshippinglogistics.com")
         MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "")
         MAIL_SMTP     = os.environ.get("MAIL_SMTP", "mail.spacemail.com")
         MAIL_PORT     = int(os.environ.get("MAIL_PORT", "465"))
@@ -290,7 +290,7 @@ def init_db():
             admin_pass = os.environ.get("ADMIN_PASSWORD", "admin123")
             cur.execute(
                 "INSERT INTO users (username, password_hash, email, role) VALUES (%s, %s, %s, 'admin')",
-                ("admin", generate_password_hash(admin_pass), "info@globaltrackerexpress.com")
+                ("admin", generate_password_hash(admin_pass), "info@freightshippinglogistics.com")
             )
     else:
         # SQLite
@@ -359,7 +359,7 @@ def init_db():
             admin_pass = os.environ.get("ADMIN_PASSWORD", "admin123")
             cur.execute(
                 "INSERT INTO users (username, password_hash, email, role) VALUES (?, ?, ?, 'admin')",
-                ("admin", generate_password_hash(admin_pass), "info@globaltrackerexpress.com")
+                ("admin", generate_password_hash(admin_pass), "info@freightshippinglogistics.com")
             )
 
     conn.commit()
@@ -419,14 +419,14 @@ def contact():
             def _send():
                 try:
                     msg = MIMEMultipart("alternative")
-                    msg["Subject"] = f"[Global Trackers Contact] {subject or 'New Enquiry'}"
+                    msg["Subject"] = f"[freightshippinglogistics Contact] {subject or 'New Enquiry'}"
                     msg["From"]    = email_config.MAIL_SENDER
                     msg["To"]      = email_config.MAIL_SENDER
                     msg["Reply-To"] = email
                     html = f"""
                     <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto">
                       <div style="background:#1e3a5f;padding:24px 32px">
-                        <h1 style="color:#fff;margin:0;font-size:20px">&#128231; New Contact Form — Global Trackers</h1>
+                        <h1 style="color:#fff;margin:0;font-size:20px">&#128231; New Contact Form — freightshippinglogistics</h1>
                       </div>
                       <div style="padding:28px;font-size:14px;color:#334155">
                         <p><strong>Name:</strong> {name}</p>
@@ -861,14 +861,14 @@ def _send_update_email(to_email, username, tracking_number, city, status):
     def _send():
         try:
             msg = MIMEMultipart("alternative")
-            msg["Subject"] = f"Global Trackers Update: {tracking_number} — {status}"
+            msg["Subject"] = f"freightshippinglogistics Update: {tracking_number} — {status}"
             msg["From"]    = email_config.MAIL_SENDER
             msg["To"]      = to_email
             html = f"""
             <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;
                         border:1px solid #e2e8f0;border-radius:12px;overflow:hidden">
               <div style="background:#1e3a5f;padding:24px 32px">
-                <h1 style="color:#fff;margin:0;font-size:22px">&#128230; Global Trackers</h1>
+                <h1 style="color:#fff;margin:0;font-size:22px">&#128230; freightshippinglogistics</h1>
                 <p style="color:#93c5fd;margin:6px 0 0;font-size:13px">Shipment Status Update</p>
               </div>
               <div style="padding:32px">
