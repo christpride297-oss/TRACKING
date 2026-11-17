@@ -9,8 +9,8 @@
     * { font-family: 'Inter', sans-serif; }
     body {
       background:
-        radial-gradient(circle at top, rgba(37,99,235, 0.18), transparent 32%),
-        linear-gradient(135deg, #f4f7fd 0%, #edf5fb 100%);
+        radial-gradient(circle at top, rgba(56,189,248, 0.18), transparent 32%),
+        linear-gradient(135deg, #f4fbff 0%, #edf9ff 100%);
     }
     .panel {
       background: rgba(255,255,255,0.88);
@@ -25,8 +25,8 @@
     }
     .input-shell:focus {
       outline: none;
-      border-color: rgba(30,64,175, 0.45);
-      box-shadow: 0 0 0 3px rgba(37,99,235, 0.12);
+      border-color: rgba(14,165,233, 0.45);
+      box-shadow: 0 0 0 3px rgba(56,189,248, 0.12);
     }
     .input-shell::placeholder { color: #64748b; }
   </style>
@@ -35,7 +35,7 @@
 <body class="min-h-screen flex items-center justify-center px-4 py-10">
   <div class="w-full max-w-md">
     <div class="mb-6">
-      <a href="/" class="inline-flex items-center gap-1.5 text-slate-600 hover:text-[#1D4ED8] text-sm transition">
+      <a href="/" class="inline-flex items-center gap-1.5 text-slate-600 hover:text-sky-600 text-sm transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
@@ -44,13 +44,13 @@
     </div>
 
     <div class="text-center mb-8">
-      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 shadow-lg shadow-blue-500/20 bg-gradient-to-br from-[#1D4ED8] to-[#0D3B66]">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 shadow-lg shadow-sky-500/20 bg-gradient-to-br from-sky-400 to-cyan-600">
         <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M20 7l-8-4-8 4m16 0v10l-8 4m0-14L4 17m8 4V11"/>
         </svg>
       </div>
-      <h1 class="text-3xl font-black tracking-tight text-slate-900">Global <span class="text-[#1D4ED8]">Trackers</span></h1>
+      <h1 class="text-3xl font-black tracking-tight text-slate-900">Global <span class="text-sky-600">Trackers</span></h1>
       <p class="text-slate-500 mt-1 text-sm">Logistics Management Platform</p>
     </div>
 
@@ -79,7 +79,7 @@
             placeholder="Enter your password"/>
         </div>
         <button type="submit"
-          class="w-full py-3 bg-gradient-to-r from-[#1D4ED8] to-[#0D3B66] hover:from-[#1E3A8A] hover:to-[#0b2f53] text-white font-semibold rounded-xl transition text-sm shadow-[0_16px_30px_rgba(29,78,216,0.22)]">
+          class="w-full py-3 bg-gradient-to-r from-sky-500 to-cyan-600 hover:from-sky-400 hover:to-cyan-500 text-white font-semibold rounded-xl transition text-sm shadow-[0_16px_30px_rgba(14,165,233,0.22)]">
           Sign In →
         </button>
       </form>
@@ -87,7 +87,7 @@
       <div class="mt-5 pt-5 border-t border-slate-200 text-center">
         <p class="text-slate-500 text-xs">
           Don't have an account?
-          <a href="/track" class="text-[#1D4ED8] hover:text-[#1E3A8A] transition font-semibold">Track without login →</a>
+          <a href="/track" class="text-sky-600 hover:text-sky-700 transition font-semibold">Track without login →</a>
         </p>
       </div>
     </div>
